@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SillyTavern extension test fixture</title>
+    <link rel="stylesheet" href="/scripts/extensions/third-party/sillytavern-reply-notifier/style.css">
+    <style>
+        :root { color-scheme: dark; --SmartThemeBodyColor: #e7e3dd; --SmartThemeBorderColor: #504b46; }
+        body { font: 16px/1.5 system-ui, sans-serif; color: #e7e3dd; background: #191715; margin: 0; padding: 20px; }
+        main { width: min(100%, 600px); margin: 0 auto; }
+        input, button { font: inherit; }
+        .text_pole { color: inherit; background: #292623; border: 1px solid #504b46; border-radius: 6px; padding: 8px; }
+        .menu_button { color: inherit; background: #39332c; border: 1px solid #625443; border-radius: 6px; padding: 8px 12px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <main><h1>擴充套件</h1><div id="extensions_settings"></div></main>
+    <script>
+        const listeners = new Map();
+        const eventTypes = Object.fromEntries([
+            'GENERATION_STARTED', 'MESSAGE_RECEIVED', 'GENERATION_ENDED', 'GENERATION_STOPPED',
+            'CHAT_CHANGED', 'GROUP_WRAPPER_STARTED', 'GROUP_WRAPPER_FINISHED',
+        ].map(name => [name, name.toLowerCase()]));
+        const eventSource = {
+            on(name, callback) { if (!listeners.has(name)) listeners.set(name, new Set()); listeners.get(name).add(callback); },
+            removeListener(name, callback) { listeners.get(name)?.delete(callback); },
+            async emit(name, ...args) { for (const callback of listeners.get(name) ?? []) await callback(...args); },
+        };
+        const fixture = {
+            currentChatId: 'test-chat', saveCount: 0,
+            listenerCount: name => listeners.get(eventTypes[name])?.size ?? 0,
+            emit: (name, ...args) => eventSource.emit(eventTypes[name], ...args),
+        };
+        const context = {
+            chat: [], streamingProcessor: null, characterId: 0, groupId: null, eventTypes, eventSource,
+            extensionSettings: JSON.parse(localStorage.getItem('fixture-settings') || '{}'),
+            getCurrentChatId: () => fixture.currentChatId,
+            saveSettingsDebounced() { fixture.saveCount++; localStorage.setItem('fixture-settings', JSON.stringify(context.extensionSettings)); },
+        };
+        fixture.context = context;
+        fixture.reply = async (text = '你好，朋友 🔔', order = 'message-first') => {
+            await fixture.emit('GENERATION_STARTED', 'normal', {}, false);
+            const id = context.chat.push({ name: 'Alice', mes: text, is_user: false, is_system: false }) - 1;
+            if (order === 'end-first') await fixture.emit('GENERATION_ENDED', context.chat.length);
+            await fixture.emit('MESSAGE_RECEIVED', id, 'normal');
+            if (order !== 'end-first') await fixture.emit('GENERATION_ENDED', context.chat.length);
+        };
+        window.fixture = fixture;
+        window.SillyTavern = { getContext: () => context };
+    </script>
+    <script type="module" src="/scripts/extensions/third-party/sillytavern-reply-notifier/index.js"></script>
+</body>
+</html>

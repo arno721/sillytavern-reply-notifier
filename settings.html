@@ -1,0 +1,51 @@
+<div id="reply_notifier_settings" class="reply-notifier">
+    <details open>
+        <summary class="rn-heading"><strong>🔔 回覆完成通知</strong><small>Reply Notifier</small></summary>
+        <div class="rn-content">
+            <p class="rn-note">AI 回覆完成時，用系統通知提醒你。支援原生通知，也可推送到手機的 ntfy App。</p>
+            <label class="checkbox_label"><input type="checkbox" data-setting="enabled"><span>啟用回覆完成通知</span></label>
+            <label class="checkbox_label"><input type="checkbox" data-setting="onlyWhenAway"><span>只在酒館分頁位於背景或失去焦點時通知</span></label>
+            <label class="checkbox_label"><input type="checkbox" data-setting="includePreview"><span>通知中顯示角色名稱及回覆預覽</span></label>
+            <p class="rn-note">預設隱藏聊天內容。開啟預覽後，鎖定畫面可能顯示內容，ntfy 伺服器也會收到預覽。</p>
+
+            <section aria-label="原生系統通知">
+                <h4>原生系統通知</h4>
+                <label class="checkbox_label"><input type="checkbox" data-setting="nativeEnabled"><span>在目前裝置顯示系統通知</span></label>
+                <p class="rn-status" data-status="native" role="status" aria-live="polite"></p>
+                <div class="rn-actions">
+                    <button type="button" class="menu_button" data-action="permission">允許系統通知</button>
+                    <button type="button" class="menu_button" data-action="test-native">測試系統通知</button>
+                </div>
+                <p class="rn-note">需要 HTTPS 或 localhost，以及瀏覽器與作業系統的通知權限。請留意勿擾模式。</p>
+            </section>
+
+            <section aria-label="ntfy 手機推送">
+                <h4>ntfy 手機推送</h4>
+                <label class="checkbox_label"><input type="checkbox" data-setting="ntfyEnabled"><span>推送到 ntfy（可與原生通知同時啟用）</span></label>
+                <label class="rn-field"><span>ntfy 伺服器</span><input class="text_pole" type="url" data-setting="ntfyServer" placeholder="https://ntfy.sh" autocomplete="off" spellcheck="false"></label>
+                <label class="rn-field"><span>Topic／主題名稱</span><input class="text_pole" type="text" data-setting="ntfyTopic" maxlength="64" placeholder="點擊下方產生私人主題" autocomplete="off" spellcheck="false"></label>
+                <div class="rn-actions">
+                    <button type="button" class="menu_button" data-action="generate-topic">產生隨機 Topic</button>
+                    <a data-subscribe target="_blank" rel="noopener noreferrer">開啟 ntfy 訂閱頁</a>
+                </div>
+                <label class="rn-field"><span>存取權杖（選填，僅此分頁暫存）</span><input class="text_pole" type="password" data-token placeholder="需要驗證的伺服器才需填入" autocomplete="off" spellcheck="false"></label>
+                <p class="rn-note">權杖不寫入酒館設定，關閉分頁後需重填。公開伺服器的 Topic 相當於密碼，請勿分享；需要權限控管時請使用私人主題。</p>
+                <div class="rn-actions"><button type="button" class="menu_button" data-action="test-ntfy">測試 ntfy 推送</button></div>
+                <p class="rn-note">測試按鈕會送出一則範例通知，不受總開關或背景條件限制。</p>
+            </section>
+
+            <section class="rn-guide" aria-label="手機設定說明">
+                <h4>iOS／Android 接收方式</h4>
+                <ol>
+                    <li>在手機安裝 ntfy App，允許系統通知。</li>
+                    <li>在 App 訂閱上面相同的伺服器與 Topic。</li>
+                    <li>點擊「測試 ntfy 推送」，確認手機收到通知。</li>
+                </ol>
+                <p class="rn-note">iOS 原生網頁通知需支援的系統版本（16.4+）、HTTPS，以及從主畫面圖示啟動酒館。自架 ntfy 的 iOS 即時通知需設定 APNs 上游。</p>
+                <p class="rn-note">產生回覆的酒館頁面必須持續執行。手機頁面被系統暫停或關閉時，插件無法偵測完成；鎖定手機接收 ntfy 時，請在另一台裝置保持酒館執行。</p>
+                <a href="https://docs.ntfy.sh/subscribe/phone/" target="_blank" rel="noopener noreferrer">ntfy 官方安裝與接收說明 ↗</a>
+            </section>
+            <p class="rn-result" data-status="result" role="status" aria-live="polite">尚未傳送通知。可使用上方測試按鈕確認設定。</p>
+        </div>
+    </details>
+</div>

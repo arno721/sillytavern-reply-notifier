@@ -91,7 +91,7 @@ const IGNORED_TYPES = new Set(['quiet', 'impersonate', 'first_message']);
 
 /** Pairs successful message events with end events without blocking the host emitter. */
 export class CompletionTracker {
-    constructor({ getContext, getSettings, onComplete, schedule = callback => setTimeout(callback, 250), cancel = clearTimeout }) {
+    constructor({ getContext, getSettings, onComplete, schedule = callback => setTimeout(callback, 250), cancel = id => clearTimeout(id) }) {
         this.getContext = getContext;
         this.getSettings = getSettings;
         this.onComplete = onComplete;

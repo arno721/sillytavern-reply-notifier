@@ -1,0 +1,19 @@
+{
+  "display_name": "Reply Notifier · 回覆完成通知",
+  "loading_order": 100,
+  "requires": [],
+  "optional": [],
+  "dependencies": [],
+  "js": "index.js",
+  "css": "style.css",
+  "author": "arno721",
+  "version": "1.0.0",
+  "homePage": "https://github.com/arno721/sillytavern-reply-notifier",
+  "minimum_client_version": "1.13.0",
+  "auto_update": true,
+  "hooks": {
+    "enable": "onEnable",
+    "disable": "onDisable",
+    "delete": "onDelete"
+  }
+}

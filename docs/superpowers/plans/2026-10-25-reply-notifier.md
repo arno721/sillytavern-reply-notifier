@@ -54,17 +54,17 @@
 
 **Interfaces:** The entry point reads `SillyTavern.getContext()`, installs synchronous event handlers, mounts settings into `#extensions_settings`, saves preferences through `saveSettingsDebounced`, and disposes listeners on disable.
 
-- [ ] Write browser tests for the settings drawer, persistence, actual worker activation/notification, generation event wiring, channel tests, secure-context guidance and chat cancellation.
-- [ ] Run `npm run test:browser` and observe missing extension/UI failures.
-- [ ] Implement the adapter and responsive settings; run unit and browser suites and inspect the browser output.
-- [ ] Commit the installable extension.
+- [x] Write browser tests for the settings drawer, persistence, actual worker activation/notification, generation event wiring, channel tests, secure-context guidance and chat cancellation.
+- [x] Run `npm run test:browser` and observe missing extension/UI failures.
+- [x] Implement the adapter and responsive settings; run unit and browser suites and inspect the browser output.
+- [x] Commit the installable extension.
 
 ### Task 4: Documentation, review and publication
 
 **Files:** `README.md`, `CHANGELOG.md`, `LICENSE`, `.github/workflows/test.yml`, `.gitignore`.
 
-- [ ] Document installation by GitHub URL, all five platforms, ntfy setup, privacy, HTTPS/iOS constraints and generating-page suspension limits. Clearly label physical-device checks as pending.
-- [ ] Run unit and browser tests, syntax checks, package validation and whitespace checks; inspect all output.
+- [x] Document installation by GitHub URL, all five platforms, ntfy setup, privacy, HTTPS/iOS constraints and generating-page suspension limits. Clearly label physical-device checks as pending.
+- [x] Run unit and browser tests, syntax checks, package validation and whitespace checks; inspect all output.
 - [ ] Obtain a fresh code review using the requesting-code-review skill and address important findings with regression tests.
 - [ ] Publish the repository under `arno721/sillytavern-reply-notifier`, verify its default branch and installable manifest, and create a tagged release.
 
@@ -74,3 +74,5 @@ Task status and verification evidence are recorded here as each task completes.
 
 - Task 1: RED missing `core.js`, then GREEN `node --test tests/core.test.js`: 25/25 passing. Privacy defaults and both streaming event orders are covered.
 - Task 2: RED missing transport/worker modules, then GREEN `npm test`: 56/56 passing. ntfy tests use a real local HTTP server only; no third-party notifications were sent.
+- Task 3: Browser RED missing settings UI, then GREEN `npm run test:browser`: 15 passed, 1 intentionally skipped (WebKit native OS permissions). Browser testing exposed an illegal `clearTimeout` receiver; the browser cancellation regression was RED before changing the default callback binding and GREEN afterward. Chromium's legacy headless shell reports denied notification permission despite granted CDP permissions; switching the test runner to the full Chromium channel verified actual worker notifications without mocking the notification API.
+- Task 4 (pre-review): `npm test` 56/56, `npm run check` passes, `git diff --check` passes. Documentation distinguishes automation from actual-device verification. GitHub Actions release tags were queried from the official action repositories.
