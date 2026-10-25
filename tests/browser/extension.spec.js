@@ -110,6 +110,12 @@ test('Chromium activates a real scoped worker and stores an actual notification'
     await open(page);
     await page.locator('[data-action="test-native"]').click();
     await expect(page.locator('[data-status="result"]')).toContainText('成功');
+    await page.locator('[data-action="test-native"]').click();
+    await expect.poll(() => page.evaluate(async () => {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        const registration = registrations.find(item => item.scope.endsWith('/sillytavern-reply-notifier/'));
+        return (await registration.getNotifications()).length;
+    })).toBe(2);
     const notification = await page.evaluate(async () => {
         const registrations = await navigator.serviceWorker.getRegistrations();
         const registration = registrations.find(item => item.scope.endsWith('/sillytavern-reply-notifier/'));

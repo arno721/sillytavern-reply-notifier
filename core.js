@@ -82,9 +82,9 @@ function sameScope(scope, context) {
     return scope.chat === current.chat && scope.id === current.id;
 }
 
-function failedStream(context) {
+function failedStream(context, priorStream) {
     const stream = context.streamingProcessor;
-    return Boolean(stream?.isStopped || stream?.abortController?.signal?.aborted);
+    return Boolean(stream && stream !== priorStream && (stream.isStopped || stream.abortController?.signal?.aborted));
 }
 
 const IGNORED_TYPES = new Set(['quiet', 'impersonate', 'first_message']);
@@ -123,8 +123,11 @@ export class CompletionTracker {
 
     start(type, options = {}, dryRun = false) {
         this.cancelPending();
+        const context = this.getContext();
         this.session = {
-            scope: scopeOf(this.getContext()),
+            scope: scopeOf(context),
+            // A failed prior stream can remain assigned until a later non-streamed reply finishes.
+            priorStream: context.streamingProcessor,
             signal: options?.signal,
             eligible: !dryRun && !IGNORED_TYPES.has(type),
             ended: false,
@@ -142,14 +145,14 @@ export class CompletionTracker {
         const message = context.chat?.[messageId];
         if (!message || message.is_user || message.is_system || !String(message.mes ?? '').trim() || message.mes.trim() === '...') return;
         session.candidateId = messageId;
-        session.failed ||= failedStream(context);
+        session.failed ||= failedStream(context, session.priorStream);
         this.prepare();
     }
 
     end() {
         if (!this.session) return;
         this.session.ended = true;
-        this.session.failed ||= failedStream(this.getContext());
+        this.session.failed ||= failedStream(this.getContext(), this.session.priorStream);
         this.prepare();
     }
 
@@ -164,6 +167,7 @@ export class CompletionTracker {
             message: { name: String(message.name ?? ''), mes: String(message.mes) },
             scope: session.scope,
             signal: session.signal,
+            priorStream: session.priorStream,
         };
         session.done = true;
         if (this.inGroup) this.groupCandidate = candidate;
@@ -177,7 +181,7 @@ export class CompletionTracker {
             this.timer = null;
             if (revision !== this.revision || !this.getSettings().enabled || candidate.signal?.aborted) return;
             const context = this.getContext();
-            if (!sameScope(candidate.scope, context) || failedStream(context)) return;
+            if (!sameScope(candidate.scope, context) || failedStream(context, candidate.priorStream)) return;
             this.onComplete(candidate.message);
         });
     }

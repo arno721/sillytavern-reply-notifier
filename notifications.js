@@ -7,6 +7,7 @@ export class NotificationError extends Error {
 }
 
 const error = (code, message) => new NotificationError(code, message);
+let notificationSequence = 0;
 
 /** Owns only the worker registration inside this extension's directory. */
 export class NativeNotifier {
@@ -89,7 +90,9 @@ export class NativeNotifier {
     async send(payload) {
         const status = this.status();
         if (status.code !== 'READY') throw error(status.code, status.message);
-        const options = { body: payload.body, tag: payload.tag, data: { url: payload.url } };
+        // Unique tags keep later replies from silently replacing an earlier alert.
+        const id = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${++notificationSequence}`;
+        const options = { body: payload.body, tag: `${payload.tag || 'sillytavern-reply'}-${id}`, data: { url: payload.url } };
         try {
             const registration = await this.getRegistration();
             await registration.showNotification(payload.title, options);

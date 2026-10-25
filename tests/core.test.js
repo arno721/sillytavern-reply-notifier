@@ -101,6 +101,31 @@ test('an aborted generation signal cancels an otherwise valid reply', () => {
     assert.equal(f.completed.length, 0);
 });
 
+test('a failed prior stream cannot suppress the next successful non-streamed reply', () => {
+    const f = fixture();
+    f.context.streamingProcessor = { isStopped: true, abortController: { signal: { aborted: true } } };
+    f.tracker.start('normal');
+    f.tracker.receive(f.reply('successful non-streamed reply'), 'normal');
+    f.tracker.end();
+    // Upstream clears the old processor only after both events have been emitted.
+    f.context.streamingProcessor = null;
+    f.flush();
+    assert.equal(f.completed.length, 1);
+    assert.equal(f.completed[0].mes, 'successful non-streamed reply');
+});
+
+test('replacing an old failed processor with a new failing stream still suppresses notification', () => {
+    const f = fixture();
+    f.context.streamingProcessor = { isStopped: true };
+    f.tracker.start('normal');
+    f.context.streamingProcessor = { isStopped: true };
+    f.tracker.end();
+    f.context.streamingProcessor = null;
+    f.tracker.receive(f.reply('partial new stream'), 'normal');
+    f.flush();
+    assert.equal(f.completed.length, 0);
+});
+
 for (const [type, dryRun] of [['quiet', false], ['impersonate', false], ['normal', true]]) {
     test(`suppresses ${type} generation (dryRun=${dryRun})`, () => {
         const f = fixture();

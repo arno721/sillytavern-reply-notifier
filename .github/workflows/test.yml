@@ -2,7 +2,11 @@ name: Tests
 
 on:
   push:
+    paths-ignore:
+      - 'docs/superpowers/**'
   pull_request:
+    paths-ignore:
+      - 'docs/superpowers/**'
 
 permissions:
   contents: read

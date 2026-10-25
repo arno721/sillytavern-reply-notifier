@@ -72,6 +72,7 @@ test('worker notifications use the extension scope and UTF-8 payload', async () 
     assert.equal(delivered[0].options.data.url, 'https://tavern.example/');
     await notifier.send(payload);
     assert.equal(delivered.length, 2);
+    assert.notEqual(delivered[0].options.tag, delivered[1].options.tag, 'every reply must create a fresh native notification');
 });
 
 test('desktop constructor fallback still works after worker registration failure', async () => {
