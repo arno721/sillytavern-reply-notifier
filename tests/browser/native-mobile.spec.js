@@ -13,8 +13,10 @@ test('native-first setup provides Android/iOS instructions with optional push fo
     await expect(page.locator('[data-setting="ntfyEnabled"]')).not.toBeVisible();
     if (testInfo.project.name === 'ios-webkit') {
         await expect(page.locator('[data-status="native"]')).toContainText('加入主畫面');
+        await page.locator('[data-setting="nativeEnabled"]').uncheck();
         await page.locator('[data-action="permission"]').click();
         await expect(page.locator('[data-status="result"]')).toContainText('從主畫面圖示啟動');
+        await expect(page.locator('[data-setting="nativeEnabled"]')).not.toBeChecked();
     }
     await page.locator('.rn-advanced > summary').click();
     await expect(page.locator('[data-setting="ntfyEnabled"]')).toBeVisible();
@@ -36,7 +38,7 @@ test('native enable activates the real worker before the test notification', asy
     await expect(page.locator('[data-status="result"]')).toContainText('傳送成功');
 });
 
-test('a completed reply creates an actual native worker notification with no ntfy', async ({ page, context, browserName }) => {
+test('a saved disabled native channel is enabled for completed replies with no ntfy', async ({ page, context, browserName }) => {
     test.skip(browserName !== 'chromium', 'WebKit automation cannot grant native OS notification permission.');
     const external = [];
     page.on('request', request => {
@@ -44,8 +46,14 @@ test('a completed reply creates an actual native worker notification with no ntf
     });
     await context.grantPermissions(['notifications']);
     await open(page);
+    await page.locator('[data-setting="nativeEnabled"]').uncheck();
+    await page.reload();
+    await expect(page.locator('[data-setting="nativeEnabled"]')).not.toBeChecked();
     await page.locator('[data-action="permission"]').click();
     await expect(page.locator('[data-status="result"]')).toContainText('原生通知已啟用');
+    await expect(page.locator('[data-setting="nativeEnabled"]')).toBeChecked();
+    const enabled = await page.evaluate(() => JSON.parse(localStorage.getItem('fixture-settings')).reply_notifier.nativeEnabled);
+    expect(enabled).toBe(true);
     await page.evaluate(() => fixture.reply('私人手機回覆', 'end-first'));
     await expect.poll(() => page.evaluate(async () => {
         const registration = (await navigator.serviceWorker.getRegistrations()).find(item => item.scope.endsWith('/sillytavern-reply-notifier/'));

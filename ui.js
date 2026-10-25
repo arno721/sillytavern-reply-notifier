@@ -78,7 +78,11 @@ export async function mountSettings({ getSettings, onChange, native, onTestNativ
     root.querySelector('[data-action="permission"]').addEventListener('click', event => {
         void action(event.currentTarget, async () => {
             await native.enable();
-            showResult('原生通知已啟用，請點擊「測試原生通知」確認本裝置收到提醒。', true);
+            onChange('nativeEnabled', true);
+            root.querySelector('[data-setting="nativeEnabled"]').checked = true;
+            showResult(getSettings().enabled
+                ? '原生通知已啟用，請點擊「測試原生通知」確認本裝置收到提醒。'
+                : '原生通知已啟用；回覆完成通知總開關目前關閉，開啟後才能自動通知。可先測試原生通知。', true);
         });
     });
     root.querySelector('[data-action="test-native"]').addEventListener('click', event => {
