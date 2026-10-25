@@ -17,3 +17,5 @@ Local completion detection still requires the generating page to execute. A serv
 ## Verification
 
 Use TDD for Android worker delivery, iOS standalone delivery, iPad detection, permission gesture ordering, worker-only failure paths, permission cancellation, and no external delivery unless explicitly enabled. Exercise the actual browser Service Worker in desktop and Android-shaped Chromium contexts, and settings/help in iPhone-shaped WebKit. Device-shaped browser automation is not physical device testing. Update README/version/changelog, obtain one fresh code review, run CI, publish v1.1.0, and update the installed extension when available through the existing user-authorized install workflow.
+
+Review refinement: Chrome's Android desktop-site mode reports a Linux desktop user agent. Treat touch-capable Linux contexts as worker-only too; this conservative choice also affects Linux touch desktops when their worker fails. Ordinary Linux, macOS and Windows desktop fallbacks stay covered. Successful native setup persists the native channel switch without changing the master switch; failed setup does not enable delivery.

@@ -111,6 +111,39 @@ test('mobile capability hints require a worker even without an Android/iOS user 
     assert.equal(f.constructors(), 0);
 });
 
+test('Android desktop-site mode still requires worker-only enablement and delivery', async () => {
+    const f = mobileFixture('android');
+    f.environment.navigator.userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36';
+    f.environment.navigator.maxTouchPoints = 10;
+    f.environment.navigator.userAgentData = { mobile: false, platform: 'Linux' };
+    f.environment.navigator.serviceWorker.register = async () => { throw new Error('Worker blocked'); };
+    await assert.rejects(f.notifier.enable(), { code: 'WORKER_UNAVAILABLE' });
+    await assert.rejects(f.notifier.send(payload), { code: 'WORKER_UNAVAILABLE' });
+    assert.equal(f.constructors(), 0);
+    assert.deepEqual(f.delivered, []);
+});
+
+for (const [platform, userAgent, touchPoints] of [
+    ['Windows touch', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)', 10],
+    ['macOS', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', 0],
+    ['Linux', 'Mozilla/5.0 (X11; Linux x86_64)', 0],
+]) {
+    test(`${platform}: desktop notification fallback remains usable after worker failure`, async () => {
+        const f = mobileFixture('android');
+        let constructors = 0;
+        f.environment.navigator.userAgent = userAgent;
+        f.environment.navigator.maxTouchPoints = touchPoints;
+        f.environment.navigator.serviceWorker.register = async () => { throw new Error('Worker blocked'); };
+        f.environment.Notification = class {
+            static permission = 'granted';
+            constructor(title, options) { constructors++; assert.equal(title, payload.title); assert.equal(options.body, payload.body); }
+        };
+        assert.deepEqual(await f.notifier.enable(), { permission: 'granted', via: 'notification' });
+        await f.notifier.send(payload);
+        assert.equal(constructors, 1);
+    });
+}
+
 test('mobile enable waits until its worker has activated', async () => {
     const f = mobileFixture('android');
     const worker = new EventTarget();

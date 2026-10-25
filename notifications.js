@@ -14,9 +14,12 @@ function deviceInfo(env) {
     const ios = /iPad|iPhone|iPod/.test(userAgent)
         || (/Macintosh/.test(userAgent) && env.navigator?.maxTouchPoints > 1);
     const android = /Android/i.test(userAgent);
+    // Android's desktop-site mode reports Linux, including on tablets by default.
+    // Use the worker-only path for touch-capable Linux contexts as a precaution.
+    const touchLinux = /Linux/i.test(userAgent) && env.navigator?.maxTouchPoints > 0;
     return {
         ios,
-        mobile: ios || android || Boolean(env.navigator?.userAgentData?.mobile),
+        mobile: ios || android || touchLinux || Boolean(env.navigator?.userAgentData?.mobile),
         platform: ios ? 'ios' : android ? 'android' : 'desktop',
         standalone: Boolean(env.navigator?.standalone || env.matchMedia?.('(display-mode: standalone)').matches),
     };

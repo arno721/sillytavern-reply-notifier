@@ -5,7 +5,7 @@
 - Make Android and iPhone/iPad native OS notifications the primary setup; no ntfy receiver app is required.
 - Prepare the scoped Service Worker during native enablement while preserving Safari's permission gesture.
 - Use worker-only delivery on mobile, with actionable permission, activation and Home Screen errors.
-- Add Android and iOS setup guides, including iPad desktop user-agent detection.
+- Add Android and iOS setup guides, including iPad and Android desktop-site detection for worker-only delivery.
 - Keep optional ntfy controls in a collapsed advanced section without changing existing settings.
 - Cover mobile native flows with unit tests and Android Chromium / iPhone WebKit browser profiles.
 - Clarify that background generation and closed-page server Web Push are outside this client extension.

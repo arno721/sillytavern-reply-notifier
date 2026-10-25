@@ -144,6 +144,7 @@ GitHub Actions 在 Windows、macOS、Linux 執行單元測試，並在 Linux 執
 
 - [SillyTavern 擴充套件介面](https://docs.sillytavern.app/for-contributors/writing-extensions/)
 - [Apple WebKit：iOS 主畫面網頁通知](https://webkit.org/blog/13878/)
+- [Chrome：Android 平板的桌面網站模式](https://developer.chrome.com/blog/desktop-mode)
 - [ntfy JSON 發布 API](https://docs.ntfy.sh/publish/#publish-as-json)
 
 MIT License © 2026 arno721
