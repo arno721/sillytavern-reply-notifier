@@ -66,7 +66,7 @@
 - [x] Document installation by GitHub URL, all five platforms, ntfy setup, privacy, HTTPS/iOS constraints and generating-page suspension limits. Clearly label physical-device checks as pending.
 - [x] Run unit and browser tests, syntax checks, package validation and whitespace checks; inspect all output.
 - [x] Obtain a fresh code review using the requesting-code-review skill and address important findings with regression tests.
-- [ ] Publish the repository under `arno721/sillytavern-reply-notifier`, verify its default branch and installable manifest, and create a tagged release.
+- [x] Publish the repository under `arno721/sillytavern-reply-notifier`, verify its default branch and installable manifest, and create a tagged release.
 
 ## Execution record
 
@@ -80,3 +80,5 @@ Task status and verification evidence are recorded here as each task completes.
 - Final: fixed repeated native notifications replacing the first — distinct native tags, unit assertion and actual Chromium notification-count regression RED→GREEN.
 - Final: fixed stale failed-stream state suppressing a later successful non-streamed reply — capture the prior processor identity and ignore it for the new session; both stale failure and current failure cases covered RED→GREEN.
 - Final verification: `npm test` 58/58; `npm run test:browser` 15 passed / 1 intentionally skipped; `npm run check` and `git diff --check` passed. No unresolved review findings. Screenshot inspected at `docs/images/settings.png`.
+- Publication: public repository https://github.com/arno721/sillytavern-reply-notifier with default branch `main`, MIT license and accessible root manifest. GitHub Actions run https://github.com/arno721/sillytavern-reply-notifier/actions/runs/40191158973 succeeded for Windows/macOS/Linux unit tests and Chromium/WebKit browser integration, at code commit `1c92d1a50e0670a7165199f3aca6d11df0438f24`.
+- Release: https://github.com/arno721/sillytavern-reply-notifier/releases/tag/v1.0.0 published (not a draft/prerelease), including the no-build installation ZIP. Actual iOS/Android device checks and full-host SillyTavern end-to-end validation remain explicitly outside this delivery's verified test scope, as documented in README.
