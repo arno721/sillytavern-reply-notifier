@@ -13,6 +13,8 @@ export default defineConfig({
     projects: [
         { name: 'chromium', use: { ...devices['Desktop Chrome'], channel: 'chromium' } },
         { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+        { name: 'android-chromium', use: { ...devices['Pixel 7'], browserName: 'chromium', channel: 'chromium' } },
+        { name: 'ios-webkit', use: { ...devices['iPhone 13'], browserName: 'webkit' } },
     ],
     webServer: {
         command: 'node tests/browser/server.mjs',

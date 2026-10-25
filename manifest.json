@@ -7,7 +7,7 @@
   "js": "index.js",
   "css": "style.css",
   "author": "arno721",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "homePage": "https://github.com/arno721/sillytavern-reply-notifier",
   "minimum_client_version": "1.13.0",
   "auto_update": true,

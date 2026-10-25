@@ -9,6 +9,19 @@ export class NotificationError extends Error {
 const error = (code, message) => new NotificationError(code, message);
 let notificationSequence = 0;
 
+function deviceInfo(env) {
+    const userAgent = env.navigator?.userAgent ?? '';
+    const ios = /iPad|iPhone|iPod/.test(userAgent)
+        || (/Macintosh/.test(userAgent) && env.navigator?.maxTouchPoints > 1);
+    const android = /Android/i.test(userAgent);
+    return {
+        ios,
+        mobile: ios || android || Boolean(env.navigator?.userAgentData?.mobile),
+        platform: ios ? 'ios' : android ? 'android' : 'desktop',
+        standalone: Boolean(env.navigator?.standalone || env.matchMedia?.('(display-mode: standalone)').matches),
+    };
+}
+
 /** Owns only the worker registration inside this extension's directory. */
 export class NativeNotifier {
     constructor({ environment = globalThis, workerUrl = new URL('./service-worker.js', import.meta.url).href } = {}) {
@@ -20,28 +33,30 @@ export class NativeNotifier {
     status() {
         const env = this.environment;
         const permission = env.Notification?.permission ?? 'unsupported';
-        const ios = /iPad|iPhone|iPod/.test(env.navigator?.userAgent ?? '')
-            || (/Macintosh/.test(env.navigator?.userAgent ?? '') && env.navigator?.maxTouchPoints > 1);
-        const standalone = Boolean(env.navigator?.standalone || env.matchMedia?.('(display-mode: standalone)').matches);
+        const device = deviceInfo(env);
+        const { ios, mobile, standalone, platform } = device;
         let code = 'READY';
-        let message = '原生通知已授權。';
+        let message = `${ios ? 'iPhone／iPad' : platform === 'android' ? 'Android' : '系統'}原生通知已授權，可點擊測試確認。`;
         if (!env.isSecureContext) {
             code = 'INSECURE_CONTEXT';
-            message = '原生通知需要 HTTPS 或本機 localhost；HTTP 區域網路網址可使用 ntfy。';
+            message = '原生通知需要 HTTPS 或本機 localhost，請改以安全網址開啟酒館。';
         } else if (ios && !standalone) {
             code = 'IOS_HOME_SCREEN';
-            message = 'iOS 請用 HTTPS 開啟酒館，加入主畫面後從圖示啟動，或使用 ntfy App 接收。';
+            message = 'iPhone／iPad 請用 Safari 開啟 HTTPS 酒館，選擇「分享 → 加入主畫面」，再從主畫面圖示啟動並啟用原生通知。';
         } else if (!env.Notification) {
             code = 'UNSUPPORTED';
-            message = '這個瀏覽器未提供原生通知，請使用 ntfy 接收。';
+            message = '這個瀏覽器未提供系統通知介面，請更新至支援通知的瀏覽器；iOS 需 16.4+ 並從主畫面開啟。';
+        } else if (mobile && typeof env.navigator?.serviceWorker?.register !== 'function') {
+            code = 'WORKER_UNAVAILABLE';
+            message = '手機原生通知服務不可用，請確認使用 HTTPS 與支援 Service Worker 的瀏覽器；iOS 請從主畫面開啟酒館。';
         } else if (permission === 'denied') {
             code = 'PERMISSION_DENIED';
             message = '通知已被封鎖，請在瀏覽器的網站權限及系統通知設定中允許。';
         } else if (permission !== 'granted') {
             code = 'PERMISSION_REQUIRED';
-            message = '點擊「允許系統通知」授權後，即可接收通知。';
+            message = '點擊「啟用原生通知」，允許通知權限後即可在本裝置接收提醒。';
         }
-        return { code, message, permission, ios, standalone };
+        return { code, message, permission, ...device };
     }
 
     async requestPermission() {
@@ -50,6 +65,22 @@ export class NativeNotifier {
         if (status.permission === 'granted') return 'granted';
         // Keep this call before the first await: Safari requires a direct user gesture.
         return await this.environment.Notification.requestPermission();
+    }
+
+    async enable() {
+        // Calling requestPermission synchronously preserves the button's user gesture.
+        const permission = await this.requestPermission();
+        if (permission !== 'granted') {
+            const status = this.status();
+            throw error(permission === 'denied' ? 'PERMISSION_DENIED' : 'PERMISSION_REQUIRED', status.message);
+        }
+        try {
+            await this.getRegistration();
+            return { permission, via: 'service-worker' };
+        } catch (failure) {
+            if (this.status().mobile) throw failure;
+            return { permission, via: 'notification' };
+        }
     }
 
     async getRegistration() {
@@ -81,7 +112,7 @@ export class NativeNotifier {
                 return registration;
             })().catch(failure => {
                 this.registrationPromise = null;
-                throw failure;
+                throw failure instanceof NotificationError ? failure : error('WORKER_UNAVAILABLE', '通知服務啟動失敗，請確認 HTTPS 與網站權限，重新整理酒館後再啟用原生通知。');
             });
         }
         return this.registrationPromise;
@@ -97,8 +128,14 @@ export class NativeNotifier {
             const registration = await this.getRegistration();
             await registration.showNotification(payload.title, options);
             return;
-        } catch {
-            // Desktop browsers may allow the constructor when workers are blocked.
+        } catch (failure) {
+            const current = this.status();
+            if (current.mobile) {
+                if (current.code !== 'READY') throw error(current.code, current.message);
+                if (failure instanceof NotificationError) throw failure;
+                throw error('NATIVE_FAILED', '手機原生通知未能顯示，請檢查系統通知權限並重新啟用。iOS 請從主畫面圖示開啟。');
+            }
+            // Only desktop browsers can use the constructor when workers are blocked.
         }
         try {
             const notification = new this.environment.Notification(payload.title, options);
@@ -107,7 +144,7 @@ export class NativeNotifier {
                 notification.close();
             };
         } catch {
-            throw error('NATIVE_FAILED', '無法顯示系統通知，請檢查瀏覽器／系統權限，或使用 ntfy。');
+            throw error('NATIVE_FAILED', '無法顯示系統通知，請檢查瀏覽器與作業系統的通知權限，再重新測試。');
         }
     }
 }

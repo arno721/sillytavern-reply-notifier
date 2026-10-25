@@ -77,8 +77,8 @@ export async function mountSettings({ getSettings, onChange, native, onTestNativ
 
     root.querySelector('[data-action="permission"]').addEventListener('click', event => {
         void action(event.currentTarget, async () => {
-            const permission = await native.requestPermission();
-            showResult(permission === 'granted' ? '通知權限已允許，請測試系統通知。' : native.status().message, permission === 'granted');
+            await native.enable();
+            showResult('原生通知已啟用，請點擊「測試原生通知」確認本裝置收到提醒。', true);
         });
     });
     root.querySelector('[data-action="test-native"]').addEventListener('click', event => {

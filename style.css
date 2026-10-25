@@ -13,6 +13,9 @@
 
 .reply-notifier .rn-heading small { margin-inline-start: 8px; opacity: 0.65; }
 .reply-notifier .rn-content { display: grid; gap: 10px; padding: 0 4px 14px; }
+.reply-notifier .rn-advanced { border-top: 1px solid var(--SmartThemeBorderColor, #555); padding-top: 12px; min-width: 0; }
+.reply-notifier .rn-advanced > summary { cursor: pointer; font-size: 0.9em; }
+.reply-notifier .rn-advanced-content { display: grid; gap: 10px; padding-top: 12px; }
 .reply-notifier section { display: grid; gap: 10px; border-top: 1px solid var(--SmartThemeBorderColor, #555); padding-top: 12px; min-width: 0; }
 .reply-notifier h4, .reply-notifier p { margin: 0; }
 .reply-notifier .checkbox_label { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; }

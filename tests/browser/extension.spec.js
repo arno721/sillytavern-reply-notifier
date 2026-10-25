@@ -14,6 +14,7 @@ async function ntfySetup(page) {
         await route.fulfill({ status: 200, contentType: 'application/json', body: '{"id":"test"}' });
     });
     await page.locator('[data-setting="nativeEnabled"]').uncheck();
+    await page.locator('.rn-advanced > summary').click();
     await page.locator('[data-setting="ntfyEnabled"]').check();
     await page.locator('[data-setting="ntfyServer"]').fill('https://ntfy.example');
     await page.locator('[data-setting="ntfyTopic"]').fill('st-browser-topic');
@@ -24,6 +25,7 @@ test('settings persist while tokens remain outside saved preferences', async ({ 
     await open(page);
     await expect(page.locator('[data-setting="includePreview"]')).not.toBeChecked();
     await page.locator('[data-setting="onlyWhenAway"]').check();
+    await page.locator('.rn-advanced > summary').click();
     await page.locator('[data-token]').fill('tk_browser_secret');
     await expect.poll(() => page.evaluate(() => fixture.saveCount)).toBeGreaterThan(0);
     const saved = await page.evaluate(() => localStorage.getItem('fixture-settings'));
@@ -74,6 +76,7 @@ test('focused-tab filtering skips automatic notifications but allows explicit te
 
 test('topic generation updates preferences and the subscription link', async ({ page }) => {
     await open(page);
+    await page.locator('.rn-advanced > summary').click();
     await page.locator('[data-action="generate-topic"]').click();
     const topic = await page.locator('[data-setting="ntfyTopic"]').inputValue();
     expect(topic).toMatch(/^st-[0-9a-f]{32}$/);
@@ -101,7 +104,8 @@ test('settings fit a mobile screen without horizontal overflow', async ({ page }
     await open(page);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow).toBeLessThanOrEqual(1);
-    await expect(page.getByText('iOS／Android 接收方式')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Android 原生通知', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'iPhone／iPad 原生通知', exact: true })).toBeVisible();
 });
 
 test('Chromium activates a real scoped worker and stores an actual notification', async ({ page, context, browserName }) => {
