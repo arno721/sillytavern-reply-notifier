@@ -43,10 +43,10 @@
 
 **Interfaces:** `NativeNotifier` provides `status()`, `requestPermission()` and `send(payload)`; `sendNtfy(settings, token, payload, options)` and `deliverNotification({ settings, token, payload, native, fetchImpl })` return explicit channel results. Worker click handling only opens same-origin HTTP(S) URLs.
 
-- [ ] Write failing tests for permission failures, worker fallback, ntfy base paths/Unicode, endpoint validation, HTTP errors, timeouts, token headers and independent delivery.
-- [ ] Run `node --test tests/notifications.test.js tests/service-worker.test.js`; inspect expected failures.
-- [ ] Implement transports and click handling; run `npm test` and expect all tests passing.
-- [ ] Commit the independently tested delivery channels.
+- [x] Write failing tests for permission failures, worker fallback, ntfy base paths/Unicode, endpoint validation, HTTP errors, timeouts, token headers and independent delivery.
+- [x] Run `node --test tests/notifications.test.js tests/service-worker.test.js`; inspect expected failures.
+- [x] Implement transports and click handling; run `npm test` and expect all tests passing.
+- [x] Commit the independently tested delivery channels.
 
 ### Task 3: Installable UI and browser integration
 
@@ -73,3 +73,4 @@
 Task status and verification evidence are recorded here as each task completes.
 
 - Task 1: RED missing `core.js`, then GREEN `node --test tests/core.test.js`: 25/25 passing. Privacy defaults and both streaming event orders are covered.
+- Task 2: RED missing transport/worker modules, then GREEN `npm test`: 56/56 passing. ntfy tests use a real local HTTP server only; no third-party notifications were sent.
