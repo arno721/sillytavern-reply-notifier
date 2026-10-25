@@ -11,7 +11,7 @@ AI 回覆完成後，發送系統通知。提供瀏覽器原生通知及可選�
 2. 貼上此倉庫網址：
 
    ```text
-   https://github.com/arno721/sillytavern-reply-notifier
+   https://github.com/arno721/sillytavern-reply-notifier.git
    ```
 
 3. 安裝後重新整理，在擴充套件設定找到 **🔔 回覆完成通知**。
@@ -82,6 +82,7 @@ AI 回覆完成後，發送系統通知。提供瀏覽器原生通知及可選�
 
 | 現象 | 檢查方式 |
 | --- | --- |
+| 安裝時顯示失敗，請求回傳 HTTP 502 | 檢查酒館後端與反向代理日誌。等前一個安裝請求結束後，用上面的完整 `.git` 倉庫網址重試；避免連續發送同一插件的安裝請求。502 本身不足以判斷插件檔案是否有問題。 |
 | HTTP 區域網路網址沒有原生通知 | `http://192.168.x.x` 不是安全來源。設定 HTTPS，或使用 ntfy 接收。手機的 localhost 是手機本身。 |
 | iPhone 的普通瀏覽器分頁沒有通知權限 | 使用 ntfy App，或改以 HTTPS 主畫面網頁 App 啟動酒館。 |
 | 授權後仍看不到通知 | 檢查 OS 通知權限、勿擾模式及瀏覽器網站設定；通知可能只出現在通知中心。 |
@@ -105,7 +106,7 @@ npm run test:browser
 
 GitHub Actions 在 Windows、macOS、Linux 執行單元測試，並在 Linux 執行 Chromium／WebKit 瀏覽器整合測試。Chromium 使用完整瀏覽器的新版 headless 模式；舊 headless shell 會硬性封鎖通知。
 
-本地驗證包含完成事件的兩種順序、中斷競態、群聊、隱私預設、真實本機 HTTP 發布與逾時、設定儲存、手機寬度版面、實際 Chromium Service Worker 註冊及通知儲存。WebKit 自動化不提供 OS 通知授權，因此該項原生通知測試只在 Chromium 執行。瀏覽器使用模擬酒館上下文來驗證整合，**未在這次交付中跑完整酒館端到端或 iOS／Android 實機測試**。
+本地驗證包含完成事件的兩種順序、中斷競態、群聊、隱私預設、真實本機 HTTP 發布與逾時、設定儲存、手機寬度版面、實際 Chromium Service Worker 註冊及通知儲存。WebKit 自動化不提供 OS 通知授權，因此該項原生通知測試只在 Chromium 執行。瀏覽器測試使用模擬酒館上下文；另已在實際 SillyTavern 1.19.0 環境確認 Git 安裝與設定面板載入。**尚未驗證真實 API 生成的完整端到端或 iOS／Android 實機通知**。
 
 實機確認建議：在每台接收裝置完成授權／訂閱後，按通道的測試按鈕，再產生一次正常回覆並驗證停止生成不會誤報。
 
