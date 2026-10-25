@@ -1,0 +1,14 @@
+{
+  "name": "sillytavern-reply-notifier",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Cross-platform reply completion notifications for SillyTavern",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "test:browser": "playwright test",
+    "check": "node scripts/check.mjs"
+  },
+  "engines": { "node": ">=20" }
+}

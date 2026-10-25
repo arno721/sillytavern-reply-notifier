@@ -32,10 +32,10 @@
 
 **Interfaces:** `normalizeSettings(value)`, `createPayload(message, settings, url)`, and `CompletionTracker({ getContext, getSettings, onComplete, schedule, cancel })` with `start`, `receive`, `end`, `stop`, `reset`, `groupStart`, `groupEnd`.
 
-- [ ] Write tests for event ordering, stops, stream errors, quiet/dry-run/impersonation, groups, chat changes, swipes, defaults and preview privacy.
-- [ ] Run `node --test tests/core.test.js`; expected failing assertions for absent behavior.
-- [ ] Implement the state machine and formatting; run the same command and expect all tests passing.
-- [ ] Commit the independently tested core.
+- [x] Write tests for event ordering, stops, stream errors, quiet/dry-run/impersonation, groups, chat changes, swipes, defaults and preview privacy.
+- [x] Run `node --test tests/core.test.js`; expected failing assertions for absent behavior.
+- [x] Implement the state machine and formatting; run the same command and expect all tests passing.
+- [x] Commit the independently tested core.
 
 ### Task 2: Native and ntfy delivery
 
@@ -71,3 +71,5 @@
 ## Execution record
 
 Task status and verification evidence are recorded here as each task completes.
+
+- Task 1: RED missing `core.js`, then GREEN `node --test tests/core.test.js`: 25/25 passing. Privacy defaults and both streaming event orders are covered.
